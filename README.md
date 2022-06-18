@@ -1,6 +1,8 @@
+<img src="./metaformer.png" width="400px"></img>
+
 ## Metaformer - GPT (wip)
 
-Implementation of <a href="https://arxiv.org/abs/2111.11418">Metaformer</a>, but in an autoregressive manner. In particular, they propose simply using mean centering as a way to do token mixing in a parmaeter-less fashion, alternating with feedforwards.
+Implementation of <a href="https://arxiv.org/abs/2111.11418">Metaformer</a>, but in an autoregressive manner. In particular, they propose simply using mean centering as a way to do token mixing in a parameter-less fashion, alternating with feedforwards.
 
 ## Citations
 
