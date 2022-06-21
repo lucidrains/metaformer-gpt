@@ -46,7 +46,7 @@ class MeanCenteringPool(nn.Module):
         x = cummean(x, dim = 1) - x
         return self.proj(x)
 
-class MHESA(nn.Module):
+class MultiheadExponentialTimeDecay(nn.Module):
     def __init__(
         self,
         dim,
@@ -121,7 +121,7 @@ class MetaformerGPT(nn.Module):
         self.layers = nn.ModuleList([])
         for _ in range(depth):
             self.layers.append(nn.ModuleList([
-                MHESA(dim, heads = heads, dim_head = dim_head),
+                MultiheadExponentialTimeDecay(dim, heads = heads, dim_head = dim_head),
                 MeanCenteringPool(dim),
                 FeedForward(dim, mult = ff_mult)
             ]))
