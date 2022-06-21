@@ -41,7 +41,13 @@ def decode_tokens(tokens):
 
 # instantiate GPT-like decoder model
 
-model = MetaformerGPT(num_tokens=256, dim=512, depth=8)
+model = MetaformerGPT(
+    num_tokens = 256,
+    dim = 512,
+    depth = 8,
+    heads = 16,
+    dim_head = 32
+)
 
 model = AutoregressiveWrapper(model, max_seq_len=SEQ_LEN)
 model.cuda()

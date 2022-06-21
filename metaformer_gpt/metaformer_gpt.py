@@ -58,8 +58,6 @@ class MHESA(nn.Module):
         self.heads = heads
         inner_dim = heads * dim_head
 
-        self.initial_state = nn.Parameter(torch.randn(heads, dim_head))
-
         self.norm = nn.LayerNorm(dim)
         self.alpha = nn.Parameter(torch.randn(heads))
 
@@ -79,15 +77,6 @@ class MHESA(nn.Module):
 
         x = rearrange(x, 'b n (h d) -> b h n d', h = h)
 
-        # temporal difference
-
-        x = torch.cat((
-            repeat(self.initial_state, 'h d -> b h 1 d', b = b),
-            x
-        ), dim = -2)
-
-        x = x[:, :, 1:] - x[:, :, :-1]
-
         # prepare exponential alpha
 
         alpha = self.alpha.sigmoid()
@@ -98,13 +87,6 @@ class MHESA(nn.Module):
         arange = torch.arange(n, device = device)
         weights = alpha * (1 - alpha) ** torch.flip(arange, dims = (0,))
         output = conv1d_fft(x, weights)
-
-        # get initial state contribution
-
-        init_weight = (1 - alpha) ** (arange + 1)
-        init_output = rearrange(init_weight, 'h n -> h n 1') * rearrange(self.initial_state, 'h d -> h 1 d')
-
-        output = output + init_output
 
         # merge heads
 
@@ -127,7 +109,8 @@ class MetaformerGPT(nn.Module):
         num_tokens,
         dim,
         depth,
-        heads = 8,
+        heads = 16,
+        dim_head = 32,
         max_seq_len = 2048,
         ff_mult = 4
     ):
@@ -138,7 +121,7 @@ class MetaformerGPT(nn.Module):
         self.layers = nn.ModuleList([])
         for _ in range(depth):
             self.layers.append(nn.ModuleList([
-                MHESA(dim, heads = heads),
+                MHESA(dim, heads = heads, dim_head = dim_head),
                 MeanCenteringPool(dim),
                 FeedForward(dim, mult = ff_mult)
             ]))
